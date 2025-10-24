@@ -6,43 +6,15 @@ workflows:
       #  distribution_type: development
       #  bundle_identifier: com.github.pacalini.picaComic
       xcode: 15.0 #latest # <-- set to specific version e.g. 14.3, 15.0 to avoid unexpected updates.
-      #node: v16.11.1
       flutter: stable
     cache:
       cache_paths:
         - $CM_BUILD_DIR/node_modules
     scripts:
-      - name: Install dependencies
-        script: |
-          #pip3 install xmlstarlet
-          #npm install -g cordova
-      - name: Setup iOS
-        script: |
-          #cd template_src
       - name: Set up code signing settings on Xcode project
         script: |
           xcode-project use-profiles
       - name: Build iOS
-        script: |
-          #team=1234567890
-          cat <<EOF > build.json
-              {
-                "ios": {
-                  "release": {
-                    "buildFlag": ["CODE_SIGN_IDENTITY=\"\"","CODE_SIGNING_REQUIRED=NO","CODE_SIGNING_ALLOWED=NO"],
-                    "codeSignIdentity": "",
-                    "developmentTeam": "$team",
-                    "packageType": "$package_type",
-                    "provisioningProfile": ""
-                  }
-                }
-              }
-          EOF
-
-          # /Users/builder/clone/template_src/platforms/ios/ShareExtension
-          # ShareExtension-Info.plist
-          #cp -f /Users/builder/clone/ExtensionInfo.plist /Users/builder/clone/template_src/platforms/ios/ShareExtension/ShareExtension-Info.plist
-      - name: Build iOS 2
         script: |
           xcode-select --switch /Applications/Xcode_16.4.app
           flutter pub get
@@ -51,8 +23,6 @@ workflows:
           mv build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload
           cd build/ios/iphoneos/
           zip -r app-ios.ipa Payload
-          #mkdir -p ../../build/Release-iphoneos/
-          #mv HelloCordova2.ipa ../../build/Release-iphoneos/HelloCordova2-`cat $CM_BUILD_DIR/buildversionfull.txt`.ipa
     artifacts:
       - build/ios/iphoneos/*.ipa
       - /tmp/xcodebuild_logs/*.log
