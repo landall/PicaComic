@@ -45,6 +45,7 @@ workflows:
       - name: Build Android
         script: |
           cp $CM_KEYSTORE_PATH android/app/key.store
+          touch android/key.properties
           sed -i '.bak' "s/keyAlias\ /keyAlias \"$CM_KEY_ALIAS\" \/\//g" android/app/build.gradle
           sed -i '.bak' "s/keyPassword\ /keyPassword \"$CM_KEY_PASSWORD\" \/\//g" android/app/build.gradle
           sed -i '.bak' "s/storeFile\ /storeFile file(\"key.store\") \/\//g" android/app/build.gradle
@@ -52,4 +53,5 @@ workflows:
           flutter pub get
           flutter build apk --release
     artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
       - flutter_drive.log
