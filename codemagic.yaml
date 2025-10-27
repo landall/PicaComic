@@ -43,11 +43,12 @@ workflows:
         script: |
           #$ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "build-tools;35.0.0" "platforms;android-35" "platform-tools"
       - name: Build Android
-        script: |    
-          sed -i '.bak' "s/keyAlias keystoreProperties['keyAlias']/keyAlias `cat $CM_KEY_ALIAS`/" android/app/build.gradle
-          sed -i '.bak' "s/keyPassword keystoreProperties['keyPassword']/keyPassword `cat $CM_KEY_PASSWORD`/" android/app/build.gradle
-          sed -i '.bak' "s/storeFile file(keystoreProperties['storeFile'])/storeFile `cat $CM_KEYSTORE_PATH/" android/app/build.gradle
-          sed -i '.bak' "s/storePassword keystoreProperties['storePassword']/storePassword `cat $CM_KEYSTORE_PASSWORD`/" android/app/build.gradle
+        script: |
+          cp $CM_KEYSTORE_PATH android/app/key.store
+          sed -i '.bak' "s/keyAlias\ /keyAlias $CM_KEY_ALIAS \/\//g" android/app/build.gradle
+          sed -i '.bak' "s/keyPassword\ /keyPassword $CM_KEY_PASSWORD \/\//g" android/app/build.gradle
+          sed -i '.bak' "s/storeFile\ /storeFile keystore \/\//g" android/app/build.gradle
+          sed -i '.bak' "s/storePassword\ /storePassword $CM_KEYSTORE_PASSWORD \/\//g" android/app/build.gradle
           flutter pub get
           flutter build apk --release
     artifacts:
