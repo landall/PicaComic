@@ -27,3 +27,28 @@ workflows:
       - build/ios/iphoneos/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
+  android-workflow:
+    name: Android workflow
+    environment:
+      android_signing:
+        - PicaComic
+      xcode: latest
+      #java: 1.8
+      java: 17
+    cache:
+      cache_paths:
+        - $CM_BUILD_DIR/node_modules
+    scripts:
+      - name: Install dependencies
+        script: |
+          #$ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "build-tools;35.0.0" "platforms;android-35" "platform-tools"
+      - name: Build Android
+        script: |    
+          sed -i '.bak' "s/keyAlias keystoreProperties['keyAlias']/keyAlias `cat $CM_KEY_ALIAS`/" android/app/build.gradle
+          sed -i '.bak' "s/keyPassword keystoreProperties['keyPassword']/keyPassword `cat $CM_KEY_PASSWORD`/" android/app/build.gradle
+          sed -i '.bak' "s/storeFile file(keystoreProperties['storeFile'])/storeFile `cat $CM_KEYSTORE_PATH/" android/app/build.gradle
+          sed -i '.bak' "s/storePassword keystoreProperties['storePassword']/storePassword `cat $CM_KEYSTORE_PASSWORD`/" android/app/build.gradle
+          flutter pub get
+          flutter build apk --release
+    artifacts:
+      - flutter_drive.log
